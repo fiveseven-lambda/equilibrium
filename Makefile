@@ -1,2 +1,2 @@
 a: a.c
-	gcc a.c -lncurses -lm
+	gcc a.c -lncurses -lm -Wall
