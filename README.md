@@ -1,36 +1,22 @@
 # equilibrium
 simulation of equilibrium of electrolytic dissociation.
 
-When you conduct an acid-base titration experiment in the laboratory, you put one solution in a flask and drip the other solution from a burette. If you want to get weaker solution, you can dilute it. If you made too much solution, you can throw it away.
-In this program, you can do everything you can do in a laboratory.
+このプログラムでは、実験室での酸塩基平衡の滴定実験を再現することができます。
 
-HOW TO USE
+## ビルド
+make を打って下さい。
 
-The following are always shown in the program:
- amount of the solution in the flask
- concentration of each substance
- pH of the solution
- pKw and pKa of each equlibrium (to assure the quality of the simulation)
+## データファイル
+使用する酸、塩基のデータを記述したファイルを作って下さい。リポジトリ内のtestを参考にして下さい。ファイルの1行目に「H+」、2行目に「OH-」、3行目に「14」と書いて下さい。3行目の値は水のイオン積を表します。ファイルの4行目以降には、酸と塩基についてのデータを次のように書いて下さい。例：
+```
+1
+0=CH3COOH
+1=CH3COO-
+pKa=4.76
+```
+1行目の「1」は価数です。2行目と3行目では表示するときに使用する名前や化学式を指定しています。4行目は酸解離定数です。2価以上の酸の場合 pKa1、 pKa2、…のように書いて下さい。
 
-Press key a, b, ... to drip solution which contains H+, OH-, ... .
+## 使い方
+データファイルを引数に渡して実行して下さい。引数が渡されなかった場合実行してからファイル名を入力してください。上下キーで酸や塩基を選択し、スペースキーでビーカーに加えます。amountがハイライトされているときは純水、H+がハイライトされているときは強酸(完全に電離)、OH-がハイライトされているときは強塩基(完全に電離)が加えられます。エンターキーを打つとコマンドが打てます。使えるコマンドは「conc」(加える溶液の濃度を指定)、「add」(加える溶液の量を指定)、「discard」(ビーカーの中身を捨てる)、「quit」(終了する)の4つです。
 
-Press return to enter command.
-The list of command:
- "amount" - you can change the amount of solution in the flask (unit: L, default: 100 mL).
- "discard" - you can discard all of the solution (equal to "amount" "0").
- "conc" - you can change the concentration of dropping solution (unit: mol/L, default: .01).
- "water" - you can use water to dilute solution (equal to "conc" "0").
- "add" - you can change the installment of solution you add (unit: L, default: 5e-5).
- "drop" - you can drip solution drop by drop (equal to "add" "5e-5").
- "quit" - quit.
- 
-TUTORIAL
-
-When you start the program, the flask contains 100 mL of water.
-Press 'a' several times to add some acid to the water, or 'b' to add some base. Every time you press the key, 5e-5 liter of .01 mol/L acid/base will be added. This acid/base is totally ionized (pKa is negative infinity). In fact, hydrochloric acid and sodium hydroxide is almost totally ionized in water.
-Then press return, enter "discard" and press return again to discard all.
-Press return, enter "conc" and press return. Then enter ".1" and press return again. You now have .1 mol/L acetic acid and .1 mol/L sodium acetate solution.
-Press return, enter "add", press return, enter ".1" and press return. Then press 'c' once to add 100 mL acetic acid, and press 'd' once to add 100 mL sodium acetate solution. This solution is called buffer, and known to keep its pH when added acid or base, or deluted.
-Press return, enter "conc", press return, enter ".01" and press return. Then press return, enter "drop" and press return. Try adding some acid or base, and you can see pH hardly changes.
-Press return, enter "amount", press return, enter ".01" and press return. Now 10 mL of solution is left in the flask. Then delute - press return, enter "water" and press return. Press return, enter "add", press return enter ".09" and press return. Press key 'a' or 'b' or 'c' or 'd'(actually any dropping solution is now pure water, so any will do). 90 mL of water is added, but pH doesn't change.
-
+以上です。このプロジェクトがあなたの役に立てば幸いです。
