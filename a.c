@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#define NAME_LEN 10
+#define NAME_LEN 100
 
 struct Weak{
 	int step;
@@ -21,6 +21,8 @@ int main(int argc, char **argv){
 	double pKw;
 	int cursor[2] = {-2, 0};
 	double charge;
+	_Bool verbose = 0;
+	int tab = 0;
 
 	char proton[NAME_LEN], hydroxide[NAME_LEN];
 	double h = 1e-7;
@@ -53,7 +55,11 @@ int main(int argc, char **argv){
 				int tmp;
 				if(sscanf(buf, "%d", &tmp) == 1)
 					if(buf[i] == '\0') weak[n++].step = tmp;
-					else strcpy(weak[n - 1].name[tmp], buf + i + 1);
+					else{
+						int len = strlen(buf + i + 1) + 2;
+						if(tab < len) tab = len;
+						strcpy(weak[n - 1].name[tmp], buf + i + 1);
+					}
 				else if(buf[i] == '='){
 					buf[i] = '\0';
 					if(buf[0] == 'p' && buf[1] == 'K'){
@@ -87,6 +93,7 @@ int main(int argc, char **argv){
 				getstr(buf);
 				if(!strcmp(buf, "quit")) return endwin();
 				else if(!strcmp(buf, "discard")) amount = 0;
+				else if(!strcmp(buf, "amount")) scanw("%lf", &amount);
 				else if(!strcmp(buf, "conc")) scanw("%lf", &conc);
 				else if(!strcmp(buf, "add")) scanw("%lf", &add);
 				erase();
@@ -118,11 +125,15 @@ int main(int argc, char **argv){
 			case ' ':
 				acid = (acid * amount + (cursor[0] == -2) * conc * add) / (amount + add);
 				base = (base * amount + ((cursor[0] == -1) + cursor[1]) * conc * add) / (amount + add);
-				for(int i = 0; i < n; ++i) for(int j = 0; j <= weak[i].step; ++j){
+				for(int i = 0; i < n; ++i){
 					weak[i].conc_sum = (weak[i].conc_sum * amount + (cursor[0] == i) * conc * add) / (amount + add);
 				}
 				amount += add;
 				max = 1, min = 0;
+				break;
+			case 'v':
+				verbose ^= 1;
+				erase();
 				break;
 		}
 		for(int i = 0; i < 100; ++i){
@@ -145,7 +156,6 @@ int main(int argc, char **argv){
 		}
 
 		int pos = 2;
-#define TAB 10
 
 		move(pos, 0);
 		if(cursor[0] == -3) standout();
@@ -155,16 +165,22 @@ int main(int argc, char **argv){
 		if(cursor[0] == -2) standout();
 		addch(' ');
 		printw("%s", proton);
-		move(pos, TAB);
+		move(pos, tab);
 		printw("%.2e mol/L", h);
 		standend();
 		move(++pos, 0);
 		if(cursor[0] == -1) standout();
 		addch(' ');
 		printw("%s", hydroxide);
-		move(pos, TAB);
+		move(pos, tab);
 		printw("%.2e mol/L", 1e-14 / h);
 		standend();
+		if(verbose){
+			move(++pos, 0);
+			printw("strong acid %.2e mol/L", acid);
+			move(++pos, 0);
+			printw("strong base %.2e mol/L", base);
+		}
 		for(int i = 0; i < n; ++i){
 			for(int j = 0; j <= weak[i].step; ++j){
 				move(++pos, 0);
@@ -172,14 +188,28 @@ int main(int argc, char **argv){
 				addch(' ');
 				if(cursor[1] != j) standend();
 				printw("%s", weak[i].name[j]);
-				move(pos, TAB);
+				move(pos, tab);
 				printw("%.2e mol/L", weak[i].conc[j]);
 				standend();
 			}
+			if(verbose){
+				move(++pos, 0);
+				printw("sum %.2e", weak[i].conc_sum);
+				for(int j = 0; j < weak[i].step; ++j){
+					move(++pos, 0);
+					printw("pKa%d = %.2f", j + 1, log10(weak[i].conc[j]) - log10(h) - log10(weak[i].conc[j + 1]));
+				}
+			}
 		}
 
-		move(pos + 2, 0);
+		pos += 2;
+		move(pos, 0);
 		printw("ph = %.2f", -log10(h));
+		
+		if(verbose){
+			move(++pos, 0);
+			printw("charge = %.10f", charge);
+		}
 
 		refresh();
 	}
