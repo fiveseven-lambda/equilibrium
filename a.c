@@ -129,7 +129,23 @@ int main(int argc, char **argv){
 					weak[i].conc_sum = (weak[i].conc_sum * amount + (cursor[0] == i) * conc * add) / (amount + add);
 				}
 				amount += add;
-				max = 1, min = 0;
+				max = 1;
+				min = 0;
+				break;
+			case KEY_BACKSPACE:
+				if(amount >= add){
+					acid = (acid * amount - (cursor[0] == -2) * conc * add) / (amount - add);
+					if(acid < 0) acid = 0;
+					base = (base * amount - ((cursor[0] == -1) + cursor[1]) * conc * add) / (amount - add);
+					if(base < 0) base = 0;
+					for(int i = 0; i < n; ++i){
+						weak[i].conc_sum = (weak[i].conc_sum * amount - (cursor[0] == i) * conc * add) / (amount - add);
+						if(weak[i].conc_sum < 0) weak[i].conc_sum = 0;
+					}
+					amount -= add;
+					max = 1;
+					min = 0;
+				}
 				break;
 			case 'v':
 				verbose ^= 1;
